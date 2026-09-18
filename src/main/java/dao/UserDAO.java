@@ -1,56 +1,62 @@
 package dao;
 
 import context.DBContext;
+import model.Role;
+import model.User;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import model.User;
 
 public class UserDAO {
 
-    // 1. Phương thức thêm tài khoản mới vào Database
-   public boolean insertUser(User user) throws Exception {
-    String sql = "INSERT INTO User (employee_id, full_name, email, phone, password, role, store_id, is_first_login, status, expire_at) "
-               + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    
-    try (Connection conn = new DBContext().getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        
-        ps.setString(1, user.getEmployeeId());
-        ps.setString(2, user.getFullName());
-        ps.setString(3, user.getEmail());
-        ps.setString(4, user.getPhone());
-        ps.setString(5, user.getPassword());
-        ps.setString(6, user.getRole());
-        ps.setInt(7, user.getStoreId());
-        ps.setBoolean(8, user.isIsFirstLogin());
-        ps.setBoolean(9, user.isStatus());
-        
-        if (user.getExpireAt() != null) {
-            ps.setDate(10, user.getExpireAt());
-        } else {
-            ps.setNull(10, java.sql.Types.DATE);
-        }
-
-        return ps.executeUpdate() > 0;
-    }
-}
-
-    // 2. Phương thức kiểm tra xem mã nhân viên (employee_id) đã tồn tại chưa
-    public boolean checkEmployeeIdExists(String employeeId) {
-        String sql = "SELECT employee_id FROM User WHERE employee_id = ?";
-        try (Connection conn = new DBContext().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setString(1, employeeId);
+    public User checkLogin(String username, String password) {
+        String sql = "SELECT u.id, u.username, u.email, u.status, u.expiration_date, u.is_first_login, " +
+                     "r.id AS role_id, r.name AS role_name, " +
+                     "ep.home_branch_id, ep.full_name, ep.phone " +
+                     "FROM users u " +
+                     "JOIN roles r ON u.role_id = r.id " +
+                     "LEFT JOIN employee_profiles ep ON u.id = ep.user_id " +
+                     "WHERE u.username = ? AND u.password_hash = ?";
+        try {
+            Connection conn = new DBContext().getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, username);
+            ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
+            
             if (rs.next()) {
-                return true; // Đã tồn tại
+                Role role = new Role(rs.getInt("role_id"), rs.getString("role_name"));
+                User user = new User();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setPhone(rs.getString("phone"));
+                user.setStatus(rs.getString("status"));
+                user.setExpirationDate(rs.getTimestamp("expiration_date"));
+                user.setFirstLogin(rs.getBoolean("is_first_login")); // Đã bổ sung
+                user.setRole(role);
+                user.setHomeBranchId(rs.getInt("home_branch_id"));
+                user.setFullName(rs.getString("full_name") != null ? rs.getString("full_name") : rs.getString("username"));
+                return user;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return false; // Chưa tồn tại
+        return null;
     }
+    
+    public boolean updatePassword(int userId, String newPassword) {
+    String sql = "UPDATE users SET password_hash = ?, is_first_login = 0 WHERE id = ?";
+    try {
+        Connection conn = new DBContext().getConnection();
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, newPassword);
+        ps.setInt(2, userId);
+        int rowsAffected = ps.executeUpdate();
+        return rowsAffected > 0;
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return false;
+}
 }

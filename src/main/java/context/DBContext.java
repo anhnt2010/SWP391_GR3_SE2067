@@ -15,7 +15,7 @@ public class DBContext {
     // Khai báo 4 thông số kết nối
     private static final String SERVER_NAME = "localhost";
     private static final String PORT_NUMBER = "3306";
-    private static final String DB_NAME = "SupermarketHRM";
+    private static final String DB_NAME = "swp391_supermarket";
     private static final String USER_NAME = "root";
     private static final String PASSWORD = "Phong22042004@"; 
     
