@@ -4,9 +4,25 @@
         <servlet-name>Login</servlet-name>
         <servlet-class>controller.Login</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>StoreController</servlet-name>
+        <servlet-class>controller.StoreController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AssignManagerController</servlet-name>
+        <servlet-class>controller.AssignManagerController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Login</servlet-name>
         <url-pattern>/Login</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StoreController</servlet-name>
+        <url-pattern>/StoreController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AssignManagerController</servlet-name>
+        <url-pattern>/AssignManagerController</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
