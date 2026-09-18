@@ -1,49 +1,38 @@
 package model;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 public class User {
-    private String employeeId;
+
+    private int id;
+    private String username; // Mã nhân viên (VD: NV001)
+    private String email;    // Có thể null
+    private String phone;    // Dùng cho xác thực / reset pass
+    private String status;
+    private Timestamp expirationDate; // Hạn tài khoản thời vụ
+    private Role role;
+    private int homeBranchId; // Bắt buộc >= 1
     private String fullName;
-    private String email;
-    private String phone;
-    private String password;
-    private String role;
-    private int storeId; // Thêm thuộc tính storeId
     private boolean isFirstLogin;
-    private boolean status;
-    private Date expireAt;
 
     public User() {
     }
 
-    public User(String employeeId, String fullName, String email, String phone, String password, String role, int storeId, boolean isFirstLogin, boolean status, Date expireAt) {
-        this.employeeId = employeeId;
-        this.fullName = fullName;
-        this.email = email;
-        this.phone = phone;
-        this.password = password;
-        this.role = role;
-        this.storeId = storeId;
-        this.isFirstLogin = isFirstLogin;
-        this.status = status;
-        this.expireAt = expireAt;
+    // Getters và Setters
+    public int getId() {
+        return id;
     }
 
-    public String getEmployeeId() {
-        return employeeId;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public void setEmployeeId(String employeeId) {
-        this.employeeId = employeeId;
+    public String getUsername() {
+        return username;
     }
 
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
@@ -62,51 +51,51 @@ public class User {
         this.phone = phone;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public int getStoreId() {
-        return storeId;
-    }
-
-    public void setStoreId(int storeId) {
-        this.storeId = storeId;
-    }
-
-    public boolean isIsFirstLogin() {
-        return isFirstLogin;
-    }
-
-    public void setIsFirstLogin(boolean isFirstLogin) {
-        this.isFirstLogin = isFirstLogin;
-    }
-
-    public boolean isStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(boolean status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
-    public Date getExpireAt() {
-        return expireAt;
+    public Timestamp getExpirationDate() {
+        return expirationDate;
     }
 
-    public void setExpireAt(Date expireAt) {
-        this.expireAt = expireAt;
+    public void setExpirationDate(Timestamp expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public int getHomeBranchId() {
+        return homeBranchId;
+    }
+
+    public void setHomeBranchId(int homeBranchId) {
+        this.homeBranchId = homeBranchId;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public boolean isFirstLogin() {
+        return isFirstLogin;
+    }
+
+    public void setFirstLogin(boolean firstLogin) {
+        isFirstLogin = firstLogin;
     }
 }
