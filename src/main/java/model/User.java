@@ -98,4 +98,8 @@ public class User {
     public void setFirstLogin(boolean firstLogin) {
         isFirstLogin = firstLogin;
     }
+    
+    public String getRoleName() {
+    return role != null ? role.getName() : "";
+}
 }

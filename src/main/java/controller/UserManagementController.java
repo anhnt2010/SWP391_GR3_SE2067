@@ -12,7 +12,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.sql.Date;
+import java.sql.Timestamp;
+import model.Role;
 import model.User;
 import model.UserView;
 
@@ -20,7 +21,7 @@ import model.UserView;
  * QUẢN TRỊ NGƯỜI DÙNG: tìm kiếm, sửa hồ sơ, phân quyền,
  * khóa/mở khóa tài khoản, reset mật khẩu.
  *
- *  GET  /admin/users                       -> danh sách + bộ lọc
+ *  GET  /admin/users                        -> danh sách + bộ lọc
  *  POST /admin/users (action=update|toggle|reset|role)
  */
 @WebServlet(name = "UserManagementController", urlPatterns = {"/admin/users"})
@@ -77,24 +78,31 @@ public class UserManagementController extends HttpServlet {
 
     private void doUpdate(HttpServletRequest request, UserAdminDAO dao, String employeeId) throws Exception {
         UserView u = new UserView();
-        u.setEmployeeId(employeeId);
+        u.setUsername(employeeId);
         u.setFullName(request.getParameter("fullName"));
         u.setEmail(blankToNull(request.getParameter("email")));
         u.setPhone(blankToNull(request.getParameter("phone")));
-        u.setRole(request.getParameter("role"));
-        u.setStoreId(parseInt(request.getParameter("storeId"), 1));
+        
+        String roleParam = request.getParameter("role");
+        if (roleParam != null) {
+            u.setRole(new Role(0, roleParam));
+        }
+        
+        u.setHomeBranchId(parseInt(request.getParameter("storeId"), 1));
         u.setDepartmentId(parseInt(request.getParameter("departmentId"), 0));
         u.setPositionId(parseInt(request.getParameter("positionId"), 0));
 
         String expireRaw = request.getParameter("expireAt");
         if (expireRaw != null && !expireRaw.trim().isEmpty()) {
-            u.setExpireAt(Date.valueOf(expireRaw));
+            u.setExpirationDate(Timestamp.valueOf(expireRaw + " 00:00:00"));
         }
 
         // Không cho hạ quyền Admin cuối cùng
         UserView old = dao.getByEmployeeId(employeeId);
-        if (old != null && "Admin".equalsIgnoreCase(old.getRole())
-                && !"Admin".equalsIgnoreCase(u.getRole())
+        String oldRoleName = (old != null && old.getRole() != null) ? old.getRole().getName() : "";
+        
+        if (old != null && "Admin".equalsIgnoreCase(oldRoleName)
+                && !"Admin".equalsIgnoreCase(roleParam)
                 && dao.countActiveAdmins() <= 1) {
             request.setAttribute("errorMessage",
                     "Không thể hạ quyền tài khoản Admin cuối cùng của hệ thống.");
@@ -121,14 +129,17 @@ public class UserManagementController extends HttpServlet {
             return;
         }
 
-        if (u.isStatus() && "Admin".equalsIgnoreCase(u.getRole()) && dao.countActiveAdmins() <= 1) {
+        String roleName = (u.getRole() != null) ? u.getRole().getName() : "";
+        boolean isActive = "ACTIVE".equalsIgnoreCase(u.getStatus()) || "1".equals(u.getStatus());
+
+        if (isActive && "Admin".equalsIgnoreCase(roleName) && dao.countActiveAdmins() <= 1) {
             request.setAttribute("errorMessage", "Không thể khóa tài khoản Admin cuối cùng của hệ thống.");
             return;
         }
 
         if (dao.toggleStatus(employeeId)) {
             request.setAttribute("successMessage",
-                    "Đã " + (u.isStatus() ? "KHÓA" : "MỞ KHÓA") + " tài khoản '" + employeeId + "'.");
+                    "Đã đổi trạng thái tài khoản '" + employeeId + "'.");
         } else {
             request.setAttribute("errorMessage", "Không đổi được trạng thái tài khoản.");
         }
@@ -137,8 +148,9 @@ public class UserManagementController extends HttpServlet {
     private void doChangeRole(HttpServletRequest request, UserAdminDAO dao, String employeeId) throws Exception {
         String newRole = request.getParameter("newRole");
         UserView u = dao.getByEmployeeId(employeeId);
+        String oldRoleName = (u != null && u.getRole() != null) ? u.getRole().getName() : "";
 
-        if (u != null && "Admin".equalsIgnoreCase(u.getRole())
+        if (u != null && "Admin".equalsIgnoreCase(oldRoleName)
                 && !"Admin".equalsIgnoreCase(newRole)
                 && dao.countActiveAdmins() <= 1) {
             request.setAttribute("errorMessage", "Không thể hạ quyền tài khoản Admin cuối cùng.");
@@ -188,7 +200,7 @@ public class UserManagementController extends HttpServlet {
     private String getCurrentUserId(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("user") instanceof User) {
-            return ((User) session.getAttribute("user")).getEmployeeId();
+            return ((User) session.getAttribute("user")).getUsername();
         }
         return null;
     }

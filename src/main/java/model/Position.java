@@ -1,6 +1,5 @@
 package model;
 
-<<<<<<< HEAD
 import java.math.BigDecimal;
 
 /** Danh mục Chức vụ kèm lương cơ bản. */
@@ -25,11 +24,19 @@ public class Position {
     public int getPositionId() { return positionId; }
     public void setPositionId(int positionId) { this.positionId = positionId; }
 
+    // Alias cho id (để tương thích nếu các Controller khác gọi getId)
+    public int getId() { return positionId; }
+    public void setId(int id) { this.positionId = id; }
+
     public String getPositionCode() { return positionCode; }
     public void setPositionCode(String positionCode) { this.positionCode = positionCode; }
 
     public String getPositionName() { return positionName; }
     public void setPositionName(String positionName) { this.positionName = positionName; }
+
+    // Alias cho name
+    public String getName() { return positionName; }
+    public void setName(String name) { this.positionName = name; }
 
     public BigDecimal getBaseSalary() { return baseSalary; }
     public void setBaseSalary(BigDecimal baseSalary) { this.baseSalary = baseSalary; }
@@ -43,22 +50,3 @@ public class Position {
         return String.format("%,.0f đ", baseSalary).replace(',', '.');
     }
 }
-=======
-public class Position {
-    private int id;
-    private String name;
-
-    public Position() {}
-
-    public Position(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-}
->>>>>>> a0469343f1085105ffc78401283c17527e0302d9

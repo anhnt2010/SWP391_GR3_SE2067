@@ -15,8 +15,8 @@ import model.User;
 /**
  * Chặn mọi truy cập vào /admin/* nếu người dùng không có vai trò Admin.
  *
- * LƯU Ý: khi bạn CHƯA làm chức năng đăng nhập, hãy để DEV_MODE = true
- * để vẫn vào được màn hình quản trị mà test. Làm xong login thì đổi về false.
+ * LƯU Ý: khi bạn CHƯA làm chức năng đăng nhập, hãy để DEV_MODE = true để vẫn
+ * vào được màn hình quản trị mà test. Làm xong login thì đổi về false.
  */
 @WebFilter(filterName = "AdminAuthFilter", urlPatterns = {"/admin/*"})
 public class AdminAuthFilter implements Filter {
@@ -43,7 +43,7 @@ public class AdminAuthFilter implements Filter {
             return;
         }
 
-        if (!"Admin".equalsIgnoreCase(user.getRole())) {
+        if (user.getRole() == null || !"Admin".equalsIgnoreCase(user.getRole().getName())) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN,
                     "Bạn không có quyền truy cập khu vực quản trị hệ thống.");
             return;

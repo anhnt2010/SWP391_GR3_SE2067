@@ -233,7 +233,7 @@ public class MasterDataController extends HttpServlet {
     private String getCurrentUserId(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("user") instanceof User) {
-            return ((User) session.getAttribute("user")).getEmployeeId();
+            return ((User) session.getAttribute("user")).getUsername();
         }
         return "AD001";
     }
